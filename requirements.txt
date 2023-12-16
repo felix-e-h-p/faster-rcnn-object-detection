@@ -1,0 +1,8 @@
+albumentations==1.0.3
+opencv-python==4.5.3.56
+numpy==1.21.2
+torch==1.9.0
+matplotlib==3.4.3
+torchvision==0.10.0
+tqdm==4.62.0
+torchmetrics==0.5.1
