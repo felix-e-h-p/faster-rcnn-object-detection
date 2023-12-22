@@ -1,4 +1,7 @@
 
+# data_transform.py
+# This module provides classes and functions for transforming and loading datasets for onshore wind turbines detection.
+
 import torch
 import cv2
 import numpy as np
@@ -15,8 +18,21 @@ from utils import collate_fn, train_transform, valid_transform
 
 
 class OnshoreWindTurbines(Dataset):
+    """
+    Custom PyTorch Dataset class for onshore wind turbines detection.
+    """
 
     def __init__(self, dir_path, width, height, classes, transforms=None):
+        """
+        Initializes the dataset.
+
+        Parameters:
+        - dir_path (str): Path to the directory containing images and XML annotations.
+        - width (int): Width of the resized images.
+        - height (int): Height of the resized images.
+        - classes (list): List of class names.
+        - transforms (callable): Image and annotation transformations (e.g., data augmentation).
+        """        
         self.transforms = transforms
         self.dir_path = dir_path
         self.height = height
@@ -27,9 +43,15 @@ class OnshoreWindTurbines(Dataset):
         self.all_images = sorted(self.all_images)
 
     def __getitem__(self, idx):
+        """
+        Retrieves and processes an image and its annotations.
 
-        # Iterate through png files in custom directory
+        Parameters:
+        - idx (int): Index of the image in the dataset.
 
+        Returns:
+        - tuple: Resized image and target annotations.
+        """
         image_name = self.all_images[idx]
         image_path = os.path.join(self.dir_path, image_name)
         image = cv2.imread(image_path)
@@ -90,21 +112,50 @@ class OnshoreWindTurbines(Dataset):
             target['boxes'] = torch.Tensor(sample['bboxes'])
 
         return image_resized, target
+
     def __len__(self):
+        """
+        Returns the total number of images in the dataset.
+
+        Returns:
+        - int: Number of images in the dataset.
+        """
         return len(self.all_images)
 
 
 def create_train_dataset():
+    """
+    Creates and returns the training dataset.
+
+    Returns:
+    - OnshoreWindTurbines: Training dataset.
+    """
     train_dataset = OnshoreWindTurbines(TRAIN_DIR, WIDTH, HEIGHT, CLASSES, train_transform())
     return train_dataset
 
 
 def create_validation_dataset():
+    """
+    Creates and returns the validation dataset.
+
+    Returns:
+    - OnshoreWindTurbines: Validation dataset.
+    """
     valid_dataset = OnshoreWindTurbines(VALID_DIR, WIDTH, HEIGHT, CLASSES, valid_transform())
     return valid_dataset
 
 
 def create_train_loader(train_dataset, num_workers):
+    """
+    Creates and returns the training data loader.
+
+    Parameters:
+    - train_dataset (OnshoreWindTurbines): Training dataset.
+    - num_workers (int): Number of parallel data loading processes.
+
+    Returns:
+    - DataLoader: Training data loader.
+    """    
     train_loader = DataLoader(train_dataset,
                               batch_size=BATCH_SIZE,
                               shuffle=True,
@@ -114,6 +165,16 @@ def create_train_loader(train_dataset, num_workers):
 
 
 def create_validation_loader(valid_dataset, num_workers):
+    """
+    Creates and returns the validation data loader.
+
+    Parameters:
+    - valid_dataset (OnshoreWindTurbines): Validation dataset.
+    - num_workers (int): Number of parallel data loading processes.
+
+    Returns:
+    - DataLoader: Validation data loader.
+    """    
     valid_loader = DataLoader(valid_dataset,
                               batch_size=BATCH_SIZE,
                               shuffle=False,

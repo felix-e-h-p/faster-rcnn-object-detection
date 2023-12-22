@@ -1,4 +1,7 @@
 
+# train.py
+# This script handles the training and validation of a Faster R-CNN object detection model.
+
 import torch
 import time
 
@@ -13,7 +16,19 @@ from data_transform import create_train_dataset, create_validation_dataset, crea
 
 
 def train(train_data_loader, model):
+    """
+    Train the Faster R-CNN model on the training dataset.
 
+    Parameters:
+        train_data_loader (DataLoader): DataLoader for the training dataset.
+        model (FasterRCNN): Faster R-CNN model.
+        optimiser (torch.optim.Optimizer): Optimizer for model training.
+        train_loss_hist (Averager): Averager object to track training loss.
+        train_itr (int): Training iteration number.
+
+    Returns:
+        list: List of training losses for each iteration.
+    """
     print('Training')
     global train_itr
     global train_loss_list
@@ -46,7 +61,18 @@ def train(train_data_loader, model):
 
 
 def validate(valid_data_loader, model):
+    """
+    Validate the Faster R-CNN model on the validation dataset.
 
+    Parameters:
+        valid_data_loader (DataLoader): DataLoader for the validation dataset.
+        model (FasterRCNN): Faster R-CNN model.
+        val_loss_hist (Averager): Averager object to track validation loss.
+        val_itr (int): Validation iteration number.
+
+    Returns:
+        list: List of validation losses for each iteration.
+    """
     print('Validating')
     global val_itr
     global val_loss_list
@@ -75,7 +101,16 @@ def validate(valid_data_loader, model):
 
 
 def calculate_mAP(data_loader, model):
+    """
+    Calculate Mean Average Precision (mAP) on the validation dataset.
 
+    Parameters:
+        data_loader (DataLoader): DataLoader for the validation dataset.
+        model (FasterRCNN): Faster R-CNN model.
+
+    Returns:
+        float: Validation Mean Average Precision (mAP).
+    """
     metric_test = MeanAveragePrecision()
     preds_single = []
     targets_single = []

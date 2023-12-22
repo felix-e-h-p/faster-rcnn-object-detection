@@ -1,4 +1,7 @@
 
+# infer.py
+# This script performs inference using a trained Faster R-CNN object detection model.
+
 import cv2
 import os
 import torch
@@ -7,16 +10,24 @@ from train_config import DEVICE, DETECTION_THRESHOLD, FRAME_COUNT, TOTAL_FPS, NU
 
 
 if __name__ == '__main__':
-
+    """
+    Main entry point for inference script.
+    """
+    # Initialize random colors for class bounding box visualizations
 	colours = np.random.uniform(0, 255, size=(NUM_CLASSES, 3))
+    
+    # Load the trained Faster R-CNN model	
 	model = create_model(num_classes=NUM_CLASSES)
     checkpoint = torch.load(os.path.join(OUT_DIR, 'best_model.pth'), map_location=DEVICE)
 	model.load_state_dict(checkpoint['model_state_dict'])
 	model.to(DEVICE).eval()
+
+    # Load test images	
 	test_images = glob.glob(test_dir + '/*.png')
 
 	for i in range(len(test_images)):
 
+        # Process each test image
 	    image_name = test_images[i].split(os.path.sep)[-1].split('.')[0]
 	    image = cv2.imread(test_images[i])
 	    orig_image = image.copy()
@@ -37,7 +48,6 @@ if __name__ == '__main__':
 	    outputs = [{k: v.to('cpu') for k, v in t.items()} for t in outputs]
 
 	    # Direct correspondance to pre-stated bounding boxes
-
 	    if len(outputs[0]['boxes']) != 0:
 
 	        boxes = outputs[0]['boxes'].data.numpy()
@@ -70,7 +80,6 @@ if __name__ == '__main__':
 	                        2, lineType=cv2.LINE_AA)
 
 	            # Crop and extract sub-image of target corresponding to predicted box coordinates
-
 	            section = orig_image[box[1]:box[3], box[0]:box[2]]
 	            section_filename = os.path.join(INFER_DIR, f"{image_name}_box{j}.png")
 	            cv2.imwrite(section_filename, section)
